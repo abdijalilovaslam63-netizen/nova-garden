@@ -1,84 +1,196 @@
-
 <!DOCTYPE html>
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NOVA 3D Garden</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#102b20">
+<title>NOVA Garden</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#102c20;color:white;font-family:Arial;text-align:center}
-header{padding:14px;background:#17432c}
-h2{margin:4px;color:#aaff99}
-#stats{padding:12px;display:flex;justify-content:center;gap:18px}
-#garden{width:100%;height:58vh;min-height:320px;display:block;touch-action:pan-y}
-button{padding:12px;margin:5px;border:0;border-radius:12px;background:#aaff99;color:#173c28;font-weight:bold}
-#msg{padding:12px}
+body{margin:0;background:#102b20;color:#fff;font-family:Arial,sans-serif;padding-bottom:85px}
+header{padding:22px 16px;background:#173d2b}
+h1{margin:0;color:#a5ff9a;font-size:27px}
+header p{margin-bottom:0;color:#d7ead9}
+.stats{display:flex;gap:10px;padding:14px}
+.stat{flex:1;background:#244a34;padding:15px 10px;border-radius:15px;text-align:center}
+.stat b{display:block;color:#a5ff9a;font-size:23px;margin-top:5px}
+main{padding:0 14px}
+.page{display:none}
+.page.active{display:block}
+h2{font-size:21px}
+.panel{background:#173d2b;padding:17px;border-radius:18px;margin:12px 0}
+button{border:0;border-radius:12px;padding:12px;background:#a5ff9a;color:#173d2b;font-weight:bold;cursor:pointer}
+.actions{display:flex;flex-wrap:wrap;gap:9px}
+.actions button{flex:1;min-width:130px}
+#garden{width:100%;height:330px;display:block;border-radius:18px;background:#72c9ed}
+.muted{color:#c5dccb;font-size:14px;line-height:1.5}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;background:#173d2b;padding:10px 3px calc(10px + env(safe-area-inset-bottom));border-top:1px solid #37664a}
+nav button{background:transparent;color:#e1f3e4;padding:8px 5px;font-size:12px;flex:1}
+nav button.active{background:#28583b;color:#a5ff9a}
+.item{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.item button{white-space:nowrap}
+#msg{padding:12px;text-align:center;color:#a5ff9a;min-height:40px}
 </style>
 </head>
 <body>
-<header><h2>🌳 NOVA 3D GARDEN</h2>Virtual bog‘ingni rivojlantir!</header>
-<div id="stats"><span>🍃 Barg: <b id="leaves">100</b></span><span>🌳 Daraxt: <b id="trees">3</b></span></div>
-<div id="garden"></div>
-<div>
-<button onclick="care(5,.12)">💧 Sug‘orish −5</button>
-<button onclick="care(10,.2)">🌿 O‘g‘it −10</button>
-<button onclick="plant()">🌱 Ekish −20</button>
+<header>
+<h1>🌳 NOVA GARDEN</h1>
+<p>Virtual bog‘ingni yarat. Kelajak uchun nihol ek!</p>
+</header>
+
+<div class="stats">
+<div class="stat">🍃 Barglar<b id="leaves">100</b></div>
+<div class="stat">🌳 Daraxtlar<b id="treesCount">1</b></div>
 </div>
-<div id="msg">Bog‘ni barmoq bilan aylantir!</div>
+
+<main>
+<section class="page active" id="home">
+<h2>🏡 Mening bog‘im</h2>
+<canvas id="garden"></canvas>
+<div class="panel">
+<h3>🌱 Daraxt parvarishi</h3>
+<div class="actions">
+<button onclick="water()">💧 Sug‘orish · 5</button>
+<button onclick="feed()">🌿 O‘g‘itlash · 10</button>
+<button onclick="plant()">🌳 Daraxt ekish · 20</button>
+</div>
+</div>
+<p class="muted">Bu hozircha demo bog‘. Ma’lumotlarni Telegram bot bilan bog‘lash keyingi bosqichda amalga oshiriladi.</p>
+</section>
+
+<section class="page" id="shop">
+<h2>🛍️ Do‘kon</h2>
+<div class="panel item">
+<div><b>🍃 100 barg</b><p class="muted">Sinov to‘plami</p></div>
+<button onclick="message('Demo: haqiqiy xarid hali yoqilmagan.')">Tanlash</button>
+</div>
+<div class="panel item">
+<div><b>🍃 500 barg</b><p class="muted">Rejalashtirilgan narx: 5 000 so‘m</p></div>
+<button onclick="message('Click arizasi tasdiqlangach, xavfsiz to‘lov ulanadi.')">Batafsil</button>
+</div>
+<p class="muted">Hozircha bu sahifada pul yechilmaydi va xarid amalga oshmaydi.</p>
+</section>
+
+<section class="page" id="tasks">
+<h2>✅ Vazifalar</h2>
+<div class="panel">
+<b>⏱ Kunlik vazifa</b>
+<p class="muted">Saytda 10 daqiqa faol bo‘lish. Kuniga bir marta.</p>
+<button onclick="message('Kunlik vazifa bot bilan bog‘langach ishlaydi.')">Holatini tekshirish</button>
+</div>
+<div class="panel">
+<b>📱 Ijtimoiy vazifalar</b>
+<p class="muted">Telegram, Instagram va YouTube sahifalariga obuna bo‘lish.</p>
+<button onclick="message('Obunani tekshirish hali ulanmagan.')">Tekshirish</button>
+</div>
+<div class="panel">
+<b>📺 Reklama ko‘rish</b>
+<p class="muted">Tasdiqlangan reklama vazifalari orqali barg yig‘ish.</p>
+<button onclick="message('Reklama tizimi hali ulanmagan.')">Ko‘rish</button>
+</div>
+<div class="panel">
+<b>👥 Referal</b>
+<p class="muted">Do‘stlaringni NOVA’ga taklif qilish.</p>
+<button onclick="message('Referal tizimi botga ulanadi.')">Taklif qilish</button>
+</div>
+</section>
+
+<section class="page" id="charity">
+<h2>🌍 Xayriya</h2>
+<div class="panel">
+<h3>Haqiqiy nihollar ekilishiga yordam ber</h3>
+<p class="muted">Xayriya mablag‘lari barg xarididan alohida hisoblanishi va ekilgan nihollar bo‘yicha hisobot berilishi rejalashtirilgan.</p>
+<button onclick="message('Xayriya to‘lovi hali yoqilmagan. Hozircha pul yuborma.')">Xayriya holati</button>
+</div>
+</section>
+
+<section class="page" id="profile">
+<h2>👤 Profil</h2>
+<div class="panel">
+<p>🌳 Bog‘dagi daraxtlar: <b id="profileTrees">1</b></p>
+<p>🍃 Barglar: <b id="profileLeaves">100</b></p>
+<p class="muted">Profil va haqiqiy statistika Telegram bot bilan bog‘langach ko‘rsatiladi.</p>
+</div>
+</section>
+</main>
+
+<div id="msg">NOVA bog‘ingga xush kelibsan!</div>
+
+<nav>
+<button class="active" onclick="showPage('home',this)">🏡<br>Bosh sahifa</button>
+<button onclick="showPage('shop',this)">🛍️<br>Do‘kon</button>
+<button onclick="showPage('tasks',this)">✅<br>Vazifalar</button>
+<button onclick="showPage('charity',this)">🌍<br>Xayriya</button>
+<button onclick="showPage('profile',this)">👤<br>Profil</button>
+</nav>
+
 <script>
-const tg=window.Telegram?.WebApp;
-tg?.ready();tg?.expand();
-const host=document.getElementById('garden');
-const scene=new THREE.Scene();
-scene.background=new THREE.Color('#8bd4ed');
-scene.fog=new THREE.Fog('#8bd4ed',18,45);
-const camera=new THREE.PerspectiveCamera(60,1,.1,100);
-camera.position.set(0,5,12);
-const renderer=new THREE.WebGLRenderer({antialias:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-renderer.shadowMap.enabled=true;
-host.appendChild(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xffffff,0x557744,2));
-const sun=new THREE.DirectionalLight(0xffffff,2);
-sun.position.set(-5,10,8);sun.castShadow=true;scene.add(sun);
-const ground=new THREE.Mesh(new THREE.CircleGeometry(18,64),new THREE.MeshStandardMaterial({color:0x4b9a42}));
-ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
-const path=new THREE.Mesh(new THREE.CircleGeometry(2.2,32),new THREE.MeshStandardMaterial({color:0xcbb68a}));
-path.rotation.x=-Math.PI/2;path.scale.set(1,2.5,1);path.position.set(0,.015,2);scene.add(path);
-let leaves=100,trees=[];
-function makeTree(x,z,size=1,growth=.6){
- const group=new THREE.Group();group.position.set(x,0,z);group.scale.setScalar(size);scene.add(group);
- const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.16,.24,1.7,8),new THREE.MeshStandardMaterial({color:0x79502c}));
- trunk.position.y=.85;trunk.castShadow=true;group.add(trunk);
- const crown=new THREE.Group();crown.position.y=1.5;group.add(crown);
- for(let i=0;i<5;i++){
-  const r=(.45+growth*.65)*(1-i*.08);
-  const leaf=new THREE.Mesh(new THREE.IcosahedronGeometry(r,1),new THREE.MeshStandardMaterial({color:[0x24833d,0x39a34a,0x2d913f][i%3]}));
-  leaf.position.set(Math.sin(i*2.4)*.48,i*.38,Math.cos(i*2.4)*.42);
-  leaf.castShadow=true;crown.add(leaf);
- }
- const fruits=[];
- if(growth>.75)for(let i=0;i<5;i++){
-  const f=new THREE.Mesh(new THREE.SphereGeometry(.09,10,10),new THREE.MeshStandardMaterial({color:0xff4545}));
-  f.position.set(Math.sin(i*4)*.6,.3+(i%3)*.35,Math.cos(i*4)*.6);crown.add(f);fruits.push(f);
- }
- trees.push({group,crown,fruits,growth});
+const canvas=document.getElementById('garden');
+const ctx=canvas.getContext('2d');
+let leaves=100;
+let trees=[{x:.5,size:1,growth:.45}];
+
+function message(text){
+ document.getElementById('msg').textContent=text;
 }
-[[-3,-2],[0,-3],[3,-2]].forEach(([x,z])=>makeTree(x,z,.9,.6));
-function resize(){const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix()}
-window.addEventListener('resize',resize);resize();
-let dragging=false,lastX=0,lastY=0,rot=0,tilt=0;
-renderer.domElement.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;lastY=e.clientY});
-window.addEventListener('pointerup',()=>dragging=false);
-window.addEventListener('pointermove',e=>{if(!dragging)return;rot+=(e.clientX-lastX)*.008;tilt=Math.max(-.4,Math.min(.6,tilt+(e.clientY-lastY)*.004));lastX=e.clientX;lastY=e.clientY});
-function update(msg){document.getElementById('leaves').textContent=leaves;document.getElementById('trees').textContent=trees.length;document.getElementById('msg').textContent=msg}
-function care(cost,amount){if(leaves<cost)return update('Barg yetarli emas!');leaves-=cost;trees.forEach(t=>{t.growth=Math.min(1,t.growth+amount);t.crown.scale.setScalar(.75+t.growth*.5);if(t.growth>.75&&!t.fruits.length){for(let i=0;i<5;i++){let f=new THREE.Mesh(new THREE.SphereGeometry(.09,10,10),new THREE.MeshStandardMaterial({color:0xff4545}));f.position.set(Math.sin(i*4)*.6,.3+(i%3)*.35,Math.cos(i*4)*.6);t.crown.add(f);t.fruits.push(f)}}});update('Daraxtlar parvarish qilindi!')}
-function plant(){if(leaves<20)return update('Barg yetarli emas!');if(trees.length>=12)return update('Bog‘ to‘ldi!');leaves-=20;const a=trees.length*2.4;makeTree(Math.sin(a)*4,Math.cos(a)*4,.7,.25);update('Yangi daraxt ekildi!')}
-function animate(){requestAnimationFrame(animate);scene.rotation.y=rot;camera.position.y=5+tilt*4;trees.forEach((t,i)=>{t.crown.rotation.y+=.002;t.crown.position.y=1.5+Math.sin(Date.now()*.001+i)*.025});renderer.render(scene,camera)}
-animate();
+function showPage(id,button){
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ document.getElementById(id).classList.add('active');
+ document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+ button.classList.add('active');
+ if(id==='home')draw();
+}
+function update(text){
+ document.getElementById('leaves').textContent=leaves;
+ document.getElementById('treesCount').textContent=trees.length;
+ document.getElementById('profileTrees').textContent=trees.length;
+ document.getElementById('profileLeaves').textContent=leaves;
+ message(text);
+ draw();
+}
+function water(){
+ if(leaves<5)return message('Barg yetarli emas!');
+ leaves-=5;
+ trees.forEach(t=>t.growth=Math.min(1,t.growth+.05));
+ update('💧 Daraxtlar sug‘orildi!');
+}
+function feed(){
+ if(leaves<10)return message('Barg yetarli emas!');
+ leaves-=10;
+ trees.forEach(t=>t.growth=Math.min(1,t.growth+.1));
+ update('🌿 Daraxtlar oziqlantirildi!');
+}
+function plant(){
+ if(leaves<20)return message('Barg yetarli emas!');
+ if(trees.length>=7)return message('Bog‘da 7 ta daraxt bor!');
+ leaves-=20;
+ trees.push({x:.12+Math.random()*.76,size:.65+Math.random()*.35,growth:.15});
+ update('🌱 Yangi daraxt ekildi!');
+}
+function draw(){
+ const w=canvas.clientWidth,h=330,dpr=window.devicePixelRatio||1;
+ canvas.width=w*dpr;canvas.height=h*dpr;
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+ const sky=ctx.createLinearGradient(0,0,0,h);
+ sky.addColorStop(0,'#72c9ed');sky.addColorStop(1,'#d5f5ce');
+ ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
+ ctx.fillStyle='#4f9c47';
+ ctx.beginPath();ctx.ellipse(w/2,h*.98,w*.8,h*.35,0,0,Math.PI*2);ctx.fill();
+ trees.forEach(t=>{
+ const x=t.x*w,y=h*.77,s=t.size*Math.min(w/300,1.3);
+ ctx.fillStyle='#684126';ctx.fillRect(x-7*s,y-75*s,14*s,78*s);
+ const r=(35+35*t.growth)*s;
+ for(let i=0;i<5;i++){
+ ctx.fillStyle=['#24723c','#328b42','#3e9e49'][i%3];
+ ctx.beginPath();ctx.ellipse(x+(i%2?12:-12)*s,y-90*s-i*13*s,r*.8,r,0,0,Math.PI*2);ctx.fill();
+ }
+ if(t.growth>.7)for(let i=0;i<5;i++){
+ ctx.fillStyle='#ff5252';ctx.beginPath();ctx.arc(x+(i-2)*10*s,y-(105+(i%2)*15)*s,4*s,0,Math.PI*2);ctx.fill();
+ }
+ });
+}
+window.addEventListener('resize',draw);
+update('🌳 NOVA bog‘ing tayyor!');
 </script>
 </body>
 </html>
