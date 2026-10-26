@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NOVA 3D Garden</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#102c20;color:white;font-family:Arial;text-align:center}
+header{padding:14px;background:#17432c}
+h2{margin:4px;color:#aaff99}
+#stats{padding:12px;display:flex;justify-content:center;gap:18px}
+#garden{width:100%;height:58vh;min-height:320px;display:block;touch-action:pan-y}
+button{padding:12px;margin:5px;border:0;border-radius:12px;background:#aaff99;color:#173c28;font-weight:bold}
+#msg{padding:12px}
+</style>
+</head>
+<body>
+<header><h2>🌳 NOVA 3D GARDEN</h2>Virtual bog‘ingni rivojlantir!</header>
+<div id="stats"><span>🍃 Barg: <b id="leaves">100</b></span><span>🌳 Daraxt: <b id="trees">3</b></span></div>
+<div id="garden"></div>
+<div>
+<button onclick="care(5,.12)">💧 Sug‘orish −5</button>
+<button onclick="care(10,.2)">🌿 O‘g‘it −10</button>
+<button onclick="plant()">🌱 Ekish −20</button>
+</div>
+<div id="msg">Bog‘ni barmoq bilan aylantir!</div>
+<script>
+const tg=window.Telegram?.WebApp;
+tg?.ready();tg?.expand();
+const host=document.getElementById('garden');
+const scene=new THREE.Scene();
+scene.background=new THREE.Color('#8bd4ed');
+scene.fog=new THREE.Fog('#8bd4ed',18,45);
+const camera=new THREE.PerspectiveCamera(60,1,.1,100);
+camera.position.set(0,5,12);
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled=true;
+host.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xffffff,0x557744,2));
+const sun=new THREE.DirectionalLight(0xffffff,2);
+sun.position.set(-5,10,8);sun.castShadow=true;scene.add(sun);
+const ground=new THREE.Mesh(new THREE.CircleGeometry(18,64),new THREE.MeshStandardMaterial({color:0x4b9a42}));
+ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+const path=new THREE.Mesh(new THREE.CircleGeometry(2.2,32),new THREE.MeshStandardMaterial({color:0xcbb68a}));
+path.rotation.x=-Math.PI/2;path.scale.set(1,2.5,1);path.position.set(0,.015,2);scene.add(path);
+let leaves=100,trees=[];
+function makeTree(x,z,size=1,growth=.6){
+ const group=new THREE.Group();group.position.set(x,0,z);group.scale.setScalar(size);scene.add(group);
+ const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.16,.24,1.7,8),new THREE.MeshStandardMaterial({color:0x79502c}));
+ trunk.position.y=.85;trunk.castShadow=true;group.add(trunk);
+ const crown=new THREE.Group();crown.position.y=1.5;group.add(crown);
+ for(let i=0;i<5;i++){
+  const r=(.45+growth*.65)*(1-i*.08);
+  const leaf=new THREE.Mesh(new THREE.IcosahedronGeometry(r,1),new THREE.MeshStandardMaterial({color:[0x24833d,0x39a34a,0x2d913f][i%3]}));
+  leaf.position.set(Math.sin(i*2.4)*.48,i*.38,Math.cos(i*2.4)*.42);
+  leaf.castShadow=true;crown.add(leaf);
+ }
+ const fruits=[];
+ if(growth>.75)for(let i=0;i<5;i++){
+  const f=new THREE.Mesh(new THREE.SphereGeometry(.09,10,10),new THREE.MeshStandardMaterial({color:0xff4545}));
+  f.position.set(Math.sin(i*4)*.6,.3+(i%3)*.35,Math.cos(i*4)*.6);crown.add(f);fruits.push(f);
+ }
+ trees.push({group,crown,fruits,growth});
+}
+[[-3,-2],[0,-3],[3,-2]].forEach(([x,z])=>makeTree(x,z,.9,.6));
+function resize(){const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix()}
+window.addEventListener('resize',resize);resize();
+let dragging=false,lastX=0,lastY=0,rot=0,tilt=0;
+renderer.domElement.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;lastY=e.clientY});
+window.addEventListener('pointerup',()=>dragging=false);
+window.addEventListener('pointermove',e=>{if(!dragging)return;rot+=(e.clientX-lastX)*.008;tilt=Math.max(-.4,Math.min(.6,tilt+(e.clientY-lastY)*.004));lastX=e.clientX;lastY=e.clientY});
+function update(msg){document.getElementById('leaves').textContent=leaves;document.getElementById('trees').textContent=trees.length;document.getElementById('msg').textContent=msg}
+function care(cost,amount){if(leaves<cost)return update('Barg yetarli emas!');leaves-=cost;trees.forEach(t=>{t.growth=Math.min(1,t.growth+amount);t.crown.scale.setScalar(.75+t.growth*.5);if(t.growth>.75&&!t.fruits.length){for(let i=0;i<5;i++){let f=new THREE.Mesh(new THREE.SphereGeometry(.09,10,10),new THREE.MeshStandardMaterial({color:0xff4545}));f.position.set(Math.sin(i*4)*.6,.3+(i%3)*.35,Math.cos(i*4)*.6);t.crown.add(f);t.fruits.push(f)}}});update('Daraxtlar parvarish qilindi!')}
+function plant(){if(leaves<20)return update('Barg yetarli emas!');if(trees.length>=12)return update('Bog‘ to‘ldi!');leaves-=20;const a=trees.length*2.4;makeTree(Math.sin(a)*4,Math.cos(a)*4,.7,.25);update('Yangi daraxt ekildi!')}
+function animate(){requestAnimationFrame(animate);scene.rotation.y=rot;camera.position.y=5+tilt*4;trees.forEach((t,i)=>{t.crown.rotation.y+=.002;t.crown.position.y=1.5+Math.sin(Date.now()*.001+i)*.025});renderer.render(scene,camera)}
+animate();
+</script>
+</body>
+</html>
