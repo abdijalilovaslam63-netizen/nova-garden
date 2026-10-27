@@ -1,0 +1,6 @@
+users.json
+.env
+*.bak
+*.backup
+__pycache__/
+*.pyc
