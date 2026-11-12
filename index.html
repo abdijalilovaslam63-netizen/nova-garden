@@ -29,7 +29,60 @@ nav button.active{background:#28583b;color:#a5ff9a}
 #msg{text-align:center;color:#a5ff9a;padding:12px}
 .progress{height:12px;background:#345b40;border-radius:20px;overflow:hidden}
 .progress div{height:100%;width:0;background:#a5ff9a}
-</style>
+
+#wheel-box {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  margin: 35px auto;
+}
+#wheel-pointer {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  color: #e53935;
+  font-size: 35px;
+}
+#wheel-disc {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 8px solid #8bc34a;
+  box-shadow: 0 5px 20px #0004;
+  background: conic-gradient(
+    #a5d66a 0deg 45deg,
+    #ffcf70 45deg 90deg,
+    #81d4a0 90deg 135deg,
+    #ffe082 135deg 180deg,
+    #80cbc4 180deg 225deg,
+    #ffab91 225deg 270deg,
+    #aed581 270deg 315deg,
+    #ce93d8 315deg 360deg
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 55px;
+  transition: transform 4s cubic-bezier(.15,.7,.15,1);
+}
+#spin-button {
+  display: block;
+  margin: 20px auto;
+  padding: 14px 30px;
+  border: 0;
+  border-radius: 14px;
+  background: #388e3c;
+  color: white;
+  font-size: 17px;
+  font-weight: bold;
+}
+#wheel-result {
+  text-align: center;
+  font-weight: bold;
+}
+\n</style>
 </head>
 <body>
 <header>
@@ -136,6 +189,17 @@ nav button.active{background:#28583b;color:#a5ff9a}
 </div>
 </section>
 
+
+<section class="page" id="wheel">
+  <h2>🎡 NOVA Omad barabani</h2>
+  <p>Har kuni 1 marta bepul aylantirish!</p>
+  <div id="wheel-box">
+    <div id="wheel-pointer">▼</div>
+    <div id="wheel-disc">🎁</div>
+  </div>
+  <button id="spin-button" onclick="spinWheel()">🎡 Aylantirish</button>
+  <p id="wheel-result">Omad sizga kulib boqsin!</p>
+</section>
 </main>
 
 <div id="msg">NOVA bog‘ingga xush kelibsan!</div>
@@ -144,6 +208,7 @@ nav button.active{background:#28583b;color:#a5ff9a}
 <button class="active" onclick="showPage('home',this)">🏡<br>Bog‘</button>
 <button onclick="showPage('shop',this)">🛍️<br>Do‘kon</button>
 <button onclick="showPage('rewards',this)">🎁<br>Mukofot</button>
+<button onclick="showPage('wheel',this)">🎡<br>Omad</button>
 <button onclick="showPage('future',this)">🌍<br>Ko‘chat</button>
 <button onclick="showPage('ranking',this)">🏆<br>Reyting</button>
 <button onclick="showPage('friends',this)">👥<br>Do‘stlar</button>
@@ -224,6 +289,74 @@ function draw(){
 }
 window.addEventListener('resize',draw);
 update('🌳 NOVA bog‘ing tayyor!');
+
+let wheelBusy = false;
+let wheelRotation = 0;
+
+const wheelPrizes = [
+  {name:"25 barg", type:"leaves", value:25, weight:20},
+  {name:"50 barg", type:"leaves", value:50, weight:18},
+  {name:"100 barg", type:"leaves", value:100, weight:12},
+  {name:"150 barg", type:"leaves", value:150, weight:7},
+  {name:"100 EXP", type:"exp", value:100, weight:10},
+  {name:"200 EXP", type:"exp", value:200, weight:7},
+  {name:"1 ta suv", type:"water", value:1, weight:4},
+  {name:"1 ta o‘g‘it", type:"fertilizer", value:1, weight:4},
+  {name:"1 kunlik himoya", type:"protection", value:1, weight:3},
+  {name:"Oddiy gul urug‘i", type:"flower", value:1, weight:3},
+  {name:"Oddiy daraxt urug‘i", type:"tree", value:1, weight:3},
+  {name:"Oltin daraxt urug‘i", type:"rare", value:1, weight:1},
+  {name:"Afsonaviy gul urug‘i", type:"rare", value:1, weight:2},
+  {name:"Afsonaviy sandiq", type:"rare", value:1, weight:2},
+  {name:"O‘sish eliksiri +25%", type:"rare", value:25, weight:3},
+  {name:"7 kunlik himoya", type:"rare", value:7, weight:2},
+  {name:"1000 EXP", type:"exp", value:1000, weight:2},
+  {name:"NOVA Premium daraxti", type:"rare", value:1, weight:0.5}
+];
+
+function spinWheel(){
+  if(wheelBusy)return;
+  const today = new Date().toLocaleDateString('en-CA');
+  if(localStorage.getItem('novaWheelDate')===today){
+    document.getElementById('wheel-result').textContent =
+      'Bugungi bepul aylantirish ishlatildi. Ertaga qayting!';
+    return;
+  }
+
+  const total = wheelPrizes.reduce((sum,p)=>sum+p.weight,0);
+  let random = Math.random()*total;
+  let prize = wheelPrizes[0];
+  for(const p of wheelPrizes){
+    random -= p.weight;
+    if(random < 0){prize=p;break;}
+  }
+
+  wheelBusy=true;
+  const disc=document.getElementById('wheel-disc');
+  const index=wheelPrizes.indexOf(prize);
+  wheelRotation += 1800 + index*(360/wheelPrizes.length);
+  disc.style.transform='rotate('+wheelRotation+'deg)';
+
+  document.getElementById('spin-button').disabled=true;
+
+  setTimeout(()=>{
+    if(prize.type==='leaves')leaves+=prize.value;
+    if(prize.type==='exp')addExp(prize.value);
+
+    let inventory=JSON.parse(localStorage.getItem('novaWheelInventory')||'{}');
+    if(['water','fertilizer','protection','flower','tree','rare'].includes(prize.type)){
+      inventory[prize.type]=(inventory[prize.type]||0)+prize.value;
+      localStorage.setItem('novaWheelInventory',JSON.stringify(inventory));
+    }
+
+    localStorage.setItem('novaWheelDate',today);
+    update('🎁 Yutuq: '+prize.name);
+    document.getElementById('wheel-result').textContent='🎉 Siz yutdingiz: '+prize.name;
+    document.getElementById('spin-button').disabled=true;
+    wheelBusy=false;
+  },4100);
+}
+
 </script>
 </body>
 </html>
