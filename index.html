@@ -247,6 +247,15 @@ function addExp(n){
  exp+=n;
  if(level<100)level=Math.min(100,Math.floor(exp/5000)+1);
 }
+function addExp(n){
+ exp+=n;
+ if(level<100)level=Math.min(100,Math.floor(exp/5000)+1);
+ update('⭐ +'+n+' EXP qo‘shildi!');
+}
+function addExp(n){
+ exp+=n;
+ if(level<100)level=Math.min(100,Math.floor(exp/5000)+1);
+}
 function water(){
  if(!trees.length)return message('Avval daraxt eking!');
  if(leaves<20)return message('Barg yetarli emas!');
