@@ -7,186 +7,219 @@
 <title>NOVA Garden</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#102b20;color:#fff;font-family:Arial,sans-serif;padding-bottom:85px}
-header{padding:22px 16px;background:#173d2b}
-h1{margin:0;color:#a5ff9a;font-size:27px}
-header p{margin-bottom:0;color:#d7ead9}
+body{margin:0;background:#102b20;color:white;font-family:Arial;padding-bottom:85px}
+header{padding:22px;background:#173d2b}
+h1{color:#a5ff9a;margin:0}
+header p,.muted{color:#c5dccb;font-size:14px}
 .stats{display:flex;gap:10px;padding:14px}
-.stat{flex:1;background:#244a34;padding:15px 10px;border-radius:15px;text-align:center}
-.stat b{display:block;color:#a5ff9a;font-size:23px;margin-top:5px}
+.stat{flex:1;background:#244a34;padding:14px;border-radius:15px;text-align:center}
+.stat b{display:block;color:#a5ff9a;font-size:23px}
 main{padding:0 14px}
 .page{display:none}
 .page.active{display:block}
-h2{font-size:21px}
 .panel{background:#173d2b;padding:17px;border-radius:18px;margin:12px 0}
-button{border:0;border-radius:12px;padding:12px;background:#a5ff9a;color:#173d2b;font-weight:bold;cursor:pointer}
+button{border:0;border-radius:12px;padding:12px;background:#a5ff9a;color:#173d2b;font-weight:bold}
 .actions{display:flex;flex-wrap:wrap;gap:9px}
-.actions button{flex:1;min-width:130px}
-#garden{width:100%;height:330px;display:block;border-radius:18px;background:#72c9ed}
-.muted{color:#c5dccb;font-size:14px;line-height:1.5}
-nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-around;background:#173d2b;padding:10px 3px calc(10px + env(safe-area-inset-bottom));border-top:1px solid #37664a}
-nav button{background:transparent;color:#e1f3e4;padding:8px 5px;font-size:12px;flex:1}
+.actions button{flex:1;min-width:125px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#173d2b;display:flex;justify-content:space-around;padding:10px 3px calc(10px + env(safe-area-inset-bottom))}
+nav button{background:transparent;color:white;font-size:11px;flex:1;padding:8px 2px}
 nav button.active{background:#28583b;color:#a5ff9a}
+#garden{width:100%;height:300px;border-radius:16px;background:#72c9ed}
 .item{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.item button{white-space:nowrap}
-#msg{padding:12px;text-align:center;color:#a5ff9a;min-height:40px}
+#msg{text-align:center;color:#a5ff9a;padding:12px}
+.progress{height:12px;background:#345b40;border-radius:20px;overflow:hidden}
+.progress div{height:100%;width:0;background:#a5ff9a}
 </style>
 </head>
 <body>
 <header>
 <h1>🌳 NOVA GARDEN</h1>
-<p>Virtual bog‘ingni yarat. Kelajak uchun nihol ek!</p>
+<p>Virtual bog‘ingni yarat. Haqiqiy tabiatni asra!</p>
 </header>
 
 <div class="stats">
 <div class="stat">🍃 Barglar<b id="leaves">100</b></div>
-<div class="stat">🌳 Daraxtlar<b id="treesCount">1</b></div>
+<div class="stat">⭐ LVL<b id="level">1</b></div>
+<div class="stat">🌳 Daraxtlar<b id="treesCount">0</b></div>
 </div>
 
 <main>
+
 <section class="page active" id="home">
 <h2>🏡 Mening bog‘im</h2>
 <canvas id="garden"></canvas>
 <div class="panel">
 <h3>🌱 Daraxt parvarishi</h3>
 <div class="actions">
-<button onclick="water()">💧 Sug‘orish · 5</button>
-<button onclick="feed()">🌿 O‘g‘itlash · 10</button>
-<button onclick="plant()">🌳 Daraxt ekish · 20</button>
+<button onclick="water()">💧 Suv · 20</button>
+<button onclick="feed()">🌿 O‘g‘it · 10</button>
 </div>
+<p class="muted">Suv +7% o‘sish. O‘g‘it +3% o‘sish.</p>
 </div>
-<p class="muted">Bu hozircha demo bog‘. Ma’lumotlarni Telegram bot bilan bog‘lash keyingi bosqichda amalga oshiriladi.</p>
+<div class="panel">
+<h3>🌳 Yangi daraxt</h3>
+<button onclick="plant()">Daraxt ekish · 20 barg</button>
+</div>
 </section>
 
 <section class="page" id="shop">
 <h2>🛍️ Do‘kon</h2>
-<div class="panel item">
-<div><b>🍃 100 barg</b><p class="muted">Sinov to‘plami</p></div>
-<button onclick="message('Demo: haqiqiy xarid hali yoqilmagan.')">Tanlash</button>
-</div>
-<div class="panel item">
-<div><b>🍃 500 barg</b><p class="muted">Rejalashtirilgan narx: 5 000 so‘m</p></div>
-<button onclick="message('Click arizasi tasdiqlangach, xavfsiz to‘lov ulanadi.')">Batafsil</button>
-</div>
-<p class="muted">Hozircha bu sahifada pul yechilmaydi va xarid amalga oshmaydi.</p>
-</section>
-
-<section class="page" id="tasks">
-<h2>✅ Vazifalar</h2>
 <div class="panel">
-<b>⏱ Kunlik vazifa</b>
-<p class="muted">Saytda 10 daqiqa faol bo‘lish. Kuniga bir marta.</p>
-<button onclick="message('Kunlik vazifa bot bilan bog‘langach ishlaydi.')">Holatini tekshirish</button>
+<h3>🍃 Barglar to‘plami</h3>
+<p>100 barg</p>
+<p class="muted">Haqiqiy xarid hali yoqilmagan.</p>
 </div>
 <div class="panel">
-<b>📱 Ijtimoiy vazifalar</b>
-<p class="muted">Telegram, Instagram va YouTube sahifalariga obuna bo‘lish.</p>
-<button onclick="message('Obunani tekshirish hali ulanmagan.')">Tekshirish</button>
-</div>
-<div class="panel">
-<b>📺 Reklama ko‘rish</b>
-<p class="muted">Tasdiqlangan reklama vazifalari orqali barg yig‘ish.</p>
-<button onclick="message('Reklama tizimi hali ulanmagan.')">Ko‘rish</button>
-</div>
-<div class="panel">
-<b>👥 Referal</b>
-<p class="muted">Do‘stlaringni NOVA’ga taklif qilish.</p>
-<button onclick="message('Referal tizimi botga ulanadi.')">Taklif qilish</button>
+<h3>💳 Click</h3>
+<p class="muted">To‘lov tizimi rasmiy tasdiq va xavfsiz ulanishdan keyin qo‘shiladi.</p>
 </div>
 </section>
 
-<section class="page" id="charity">
-<h2>🌍 Xayriya</h2>
+<section class="page" id="rewards">
+<h2>🎁 Mukofotlar</h2>
 <div class="panel">
-<h3>Haqiqiy nihollar ekilishiga yordam ber</h3>
-<p class="muted">Xayriya mablag‘lari barg xarididan alohida hisoblanishi va ekilgan nihollar bo‘yicha hisobot berilishi rejalashtirilgan.</p>
-<button onclick="message('Xayriya to‘lovi hali yoqilmagan. Hozircha pul yuborma.')">Xayriya holati</button>
+<h3>⭐ Tajriba</h3>
+<p>EXP: <b id="exp">0</b></p>
+<p>LVL: <b id="rewardLevel">1</b></p>
+<div class="progress"><div id="expbar"></div></div>
+<p class="muted">Maqsad: 1–100 darajali tizim.</p>
+</div>
+<div class="panel">
+<h3>📅 Kunlik vazifa</h3>
+<p class="muted">Kunlik vazifalar server bilan bog‘langach ishlaydi.</p>
+</div>
+</section>
+
+<section class="page" id="future">
+<h2>🌍 Yashil kelajak</h2>
+<div class="panel">
+<h3>🌱 Umumiy ko‘chat ekish</h3>
+<h1 id="virtualTotal">0 / 100</h1>
+<p>100 ta hosilga yetgan virtual daraxt = 1 ta haqiqiy ko‘chat.</p>
+<p>Haqiqiy ekish jarayonlari surat va videolar bilan Telegram kanalga joylanadi.</p>
+<a href="https://t.me/Nova_Garden" style="color:#a5ff9a">📢 NOVA Telegram kanali</a>
+</div>
+</section>
+
+<section class="page" id="ranking">
+<h2>🏆 Reyting</h2>
+<div class="panel">
+<h3>Haftalik reyting</h3>
+<p class="muted">Foydalanuvchilar natijalari server ulangach ko‘rsatiladi.</p>
+</div>
+<div class="panel">
+<h3>Umumiy reyting</h3>
+<p class="muted">Barcha davr natijalari.</p>
+</div>
+</section>
+
+<section class="page" id="friends">
+<h2>👥 Do‘stlar</h2>
+<div class="panel">
+<h3>Do‘stlaringni taklif qil</h3>
+<p>Har bir tasdiqlangan taklif uchun 50 barg.</p>
+<p class="muted">Shaxsiy taklif havolasi Telegram bilan bog‘langach yaratiladi.</p>
+</div>
+<div class="panel">
+<h3>🌳 Do‘stlar bog‘i</h3>
+<p class="muted">Do‘stlar bog‘larini ko‘rish va layk bosish keyingi bosqichda ulanadi.</p>
 </div>
 </section>
 
 <section class="page" id="profile">
 <h2>👤 Profil</h2>
 <div class="panel">
-<p>🌳 Bog‘dagi daraxtlar: <b id="profileTrees">1</b></p>
+<p>⭐ Daraja: <b id="profileLevel">1</b></p>
 <p>🍃 Barglar: <b id="profileLeaves">100</b></p>
-<p class="muted">Profil va haqiqiy statistika Telegram bot bilan bog‘langach ko‘rsatiladi.</p>
+<p>🌳 Daraxtlar: <b id="profileTrees">0</b></p>
+<p>⭐ Umumiy EXP: <b id="profileExp">0</b></p>
 </div>
 </section>
+
 </main>
 
 <div id="msg">NOVA bog‘ingga xush kelibsan!</div>
 
 <nav>
-<button class="active" onclick="showPage('home',this)">🏡<br>Bosh sahifa</button>
+<button class="active" onclick="showPage('home',this)">🏡<br>Bog‘</button>
 <button onclick="showPage('shop',this)">🛍️<br>Do‘kon</button>
-<button onclick="showPage('tasks',this)">✅<br>Vazifalar</button>
-<button onclick="showPage('charity',this)">🌍<br>Xayriya</button>
+<button onclick="showPage('rewards',this)">🎁<br>Mukofot</button>
+<button onclick="showPage('future',this)">🌍<br>Ko‘chat</button>
+<button onclick="showPage('ranking',this)">🏆<br>Reyting</button>
+<button onclick="showPage('friends',this)">👥<br>Do‘stlar</button>
 <button onclick="showPage('profile',this)">👤<br>Profil</button>
 </nav>
 
 <script>
+let leaves=100,exp=0,level=1;
+let trees=[],virtualTotal=0;
 const canvas=document.getElementById('garden');
 const ctx=canvas.getContext('2d');
-let leaves=100;
-let trees=[{x:.5,size:1,growth:.45}];
 
-function message(text){
- document.getElementById('msg').textContent=text;
-}
-function showPage(id,button){
+function message(t){document.getElementById('msg').textContent=t}
+function showPage(id,b){
  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
  document.getElementById(id).classList.add('active');
- document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
- button.classList.add('active');
+ document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+ b.classList.add('active');
  if(id==='home')draw();
 }
-function update(text){
+function update(t){
  document.getElementById('leaves').textContent=leaves;
  document.getElementById('treesCount').textContent=trees.length;
- document.getElementById('profileTrees').textContent=trees.length;
+ document.getElementById('level').textContent=level;
+ document.getElementById('exp').textContent=exp;
+ document.getElementById('rewardLevel').textContent=level;
+ document.getElementById('profileLevel').textContent=level;
  document.getElementById('profileLeaves').textContent=leaves;
- message(text);
- draw();
+ document.getElementById('profileTrees').textContent=trees.length;
+ document.getElementById('profileExp').textContent=exp;
+ document.getElementById('virtualTotal').textContent=virtualTotal%100+' / 100';
+ document.getElementById('expbar').style.width=(exp%5000/50)+'%';
+ message(t);draw();
+}
+function addExp(n){
+ exp+=n;
+ if(level<100)level=Math.min(100,Math.floor(exp/5000)+1);
 }
 function water(){
- if(leaves<5)return message('Barg yetarli emas!');
- leaves-=5;
- trees.forEach(t=>t.growth=Math.min(1,t.growth+.05));
- update('💧 Daraxtlar sug‘orildi!');
+ if(!trees.length)return message('Avval daraxt eking!');
+ if(leaves<20)return message('Barg yetarli emas!');
+ leaves-=20;
+ trees.forEach(t=>t.growth=Math.min(1,t.growth+.07));
+ addExp(7);update('💧 Sug‘orildi! +7% o‘sish');
 }
 function feed(){
+ if(!trees.length)return message('Avval daraxt eking!');
  if(leaves<10)return message('Barg yetarli emas!');
  leaves-=10;
- trees.forEach(t=>t.growth=Math.min(1,t.growth+.1));
- update('🌿 Daraxtlar oziqlantirildi!');
+ trees.forEach(t=>t.growth=Math.min(1,t.growth+.03));
+ addExp(3);update('🌿 O‘g‘it berildi! +3% o‘sish');
 }
 function plant(){
  if(leaves<20)return message('Barg yetarli emas!');
  if(trees.length>=7)return message('Bog‘da 7 ta daraxt bor!');
  leaves-=20;
- trees.push({x:.12+Math.random()*.76,size:.65+Math.random()*.35,growth:.15});
- update('🌱 Yangi daraxt ekildi!');
+ trees.push({x:.12+Math.random()*.76,size:.7+Math.random()*.3,growth:.1});
+ addExp(10);update('🌱 Yangi daraxt ekildi!');
 }
 function draw(){
- const w=canvas.clientWidth,h=330,dpr=window.devicePixelRatio||1;
+ const w=canvas.clientWidth,h=300,dpr=window.devicePixelRatio||1;
  canvas.width=w*dpr;canvas.height=h*dpr;
  ctx.setTransform(dpr,0,0,dpr,0,0);
- const sky=ctx.createLinearGradient(0,0,0,h);
+ let sky=ctx.createLinearGradient(0,0,0,h);
  sky.addColorStop(0,'#72c9ed');sky.addColorStop(1,'#d5f5ce');
  ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
  ctx.fillStyle='#4f9c47';
  ctx.beginPath();ctx.ellipse(w/2,h*.98,w*.8,h*.35,0,0,Math.PI*2);ctx.fill();
  trees.forEach(t=>{
- const x=t.x*w,y=h*.77,s=t.size*Math.min(w/300,1.3);
- ctx.fillStyle='#684126';ctx.fillRect(x-7*s,y-75*s,14*s,78*s);
- const r=(35+35*t.growth)*s;
- for(let i=0;i<5;i++){
- ctx.fillStyle=['#24723c','#328b42','#3e9e49'][i%3];
- ctx.beginPath();ctx.ellipse(x+(i%2?12:-12)*s,y-90*s-i*13*s,r*.8,r,0,0,Math.PI*2);ctx.fill();
- }
- if(t.growth>.7)for(let i=0;i<5;i++){
- ctx.fillStyle='#ff5252';ctx.beginPath();ctx.arc(x+(i-2)*10*s,y-(105+(i%2)*15)*s,4*s,0,Math.PI*2);ctx.fill();
- }
+  let x=t.x*w,y=h*.77,s=t.size*Math.min(w/300,1.3);
+  ctx.fillStyle='#684126';ctx.fillRect(x-7*s,y-75*s,14*s,78*s);
+  let r=(35+35*t.growth)*s;
+  for(let i=0;i<5;i++){
+   ctx.fillStyle=['#24723c','#328b42','#3e9e49'][i%3];
+   ctx.beginPath();ctx.ellipse(x+(i%2?12:-12)*s,y-90*s-i*13*s,r*.8,r,0,0,Math.PI*2);ctx.fill();
+  }
  });
 }
 window.addEventListener('resize',draw);
