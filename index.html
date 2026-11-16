@@ -24,7 +24,7 @@ button{border:0;border-radius:12px;padding:12px;background:#a5ff9a;color:#173d2b
 nav{position:fixed;bottom:0;left:0;right:0;background:#173d2b;display:flex;justify-content:space-around;padding:10px 3px calc(10px + env(safe-area-inset-bottom))}
 nav button{background:transparent;color:white;font-size:11px;flex:1;padding:8px 2px}
 nav button.active{background:#28583b;color:#a5ff9a}
-#garden{width:100%;height:300px;border-radius:16px;background:#72c9ed}
+#garden3d{width:100%;height:350px;border-radius:16px;overflow:hidden;background:#72c9ed;touch-action:none}
 .item{display:flex;justify-content:space-between;align-items:center;gap:10px}
 #msg{text-align:center;color:#a5ff9a;padding:12px}
 .progress{height:12px;background:#345b40;border-radius:20px;overflow:hidden}
@@ -100,7 +100,7 @@ nav button.active{background:#28583b;color:#a5ff9a}
 
 <section class="page active" id="home">
 <h2>🏡 Mening bog‘im</h2>
-<canvas id="garden"></canvas>
+<div id="garden3d"></div>
 <div class="panel">
 <h3>🌱 Daraxt parvarishi</h3>
 <div class="actions">
@@ -218,8 +218,8 @@ nav button.active{background:#28583b;color:#a5ff9a}
 <script>
 let leaves=100,exp=0,level=1;
 let trees=[],virtualTotal=0;
-const canvas=document.getElementById('garden');
-const ctx=canvas.getContext('2d');
+window.getGardenTrees=()=>trees;
+const garden3d=document.getElementById('garden3d');
 
 function message(t){document.getElementById('msg').textContent=t}
 function showPage(id,b){
@@ -278,23 +278,7 @@ function plant(){
  addExp(10);update('🌱 Yangi daraxt ekildi!');
 }
 function draw(){
- const w=canvas.clientWidth,h=300,dpr=window.devicePixelRatio||1;
- canvas.width=w*dpr;canvas.height=h*dpr;
- ctx.setTransform(dpr,0,0,dpr,0,0);
- let sky=ctx.createLinearGradient(0,0,0,h);
- sky.addColorStop(0,'#72c9ed');sky.addColorStop(1,'#d5f5ce');
- ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
- ctx.fillStyle='#4f9c47';
- ctx.beginPath();ctx.ellipse(w/2,h*.98,w*.8,h*.35,0,0,Math.PI*2);ctx.fill();
- trees.forEach(t=>{
-  let x=t.x*w,y=h*.77,s=t.size*Math.min(w/300,1.3);
-  ctx.fillStyle='#684126';ctx.fillRect(x-7*s,y-75*s,14*s,78*s);
-  let r=(35+35*t.growth)*s;
-  for(let i=0;i<5;i++){
-   ctx.fillStyle=['#24723c','#328b42','#3e9e49'][i%3];
-   ctx.beginPath();ctx.ellipse(x+(i%2?12:-12)*s,y-90*s-i*13*s,r*.8,r,0,0,Math.PI*2);ctx.fill();
-  }
- });
+ if(window.drawGarden3D) window.drawGarden3D();
 }
 window.addEventListener('resize',draw);
 update('🌳 NOVA bog‘ing tayyor!');
@@ -367,5 +351,6 @@ function spinWheel(){
 }
 
 </script>
+<script type="module" src="./garden3d.js"></script>
 </body>
 </html>
